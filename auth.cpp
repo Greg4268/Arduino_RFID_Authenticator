@@ -12,8 +12,13 @@
 
 MFRC522 mfrc522(SS_PIN, RST_PIN);
 
+byte authorizedUID[][4] = {
+  {0xAA, 0x98, 0x85, 0xB1},
+  {0xAA, 0xAA, 0xAA, 0xAA},
+  {0xAA, 0xAA, 0xAA, 0xAA}
+};
 
-byte authorizedUID[] = {0xAA, 0x98, 0x85, 0xB1};
+const int numAuthorizedCards = sizeof(authorizedUID) / sizeof(authorizedUID[0]);
 
 void setup() {
   Serial.begin(9600);
@@ -46,11 +51,22 @@ void loop() {
   delay(1500); // preventing double reads 
 }
 
-bool checkUID(byte *uid){
-  for(byte i = 0; i < 4; i++){
-    if(uid[i] != authorizedUID[i]) return false;
+bool checkUID(byte *uid) {
+  bool match;
+  
+  for(int i = 0; i < numAuthorizedCards; i++) {
+    match = true;
+    
+    // Check each byte of the UID
+    for(byte j = 0; j < 4; j++) {
+      if(uid[j] != authorizedUID[i][j]) {
+        match = false;
+        break;  
+      }
+    }
+    if(match) return true; 
   }
-  return true;
+  return false;  
 }
 
 void successAuth() {
