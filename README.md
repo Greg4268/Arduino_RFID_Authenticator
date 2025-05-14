@@ -76,7 +76,6 @@ Loop:
 
 ## 🚀 Future Improvements
 
-- Support for multiple authorized cards.
 - Store UIDs in EEPROM or external storage.
 - Add OLED display for visual feedback.
 - WiFi logging or integration with a web server for remote tracking.
