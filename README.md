@@ -81,3 +81,6 @@ Loop:
 
 ### Sorry in advance, the wiring makes it difficult to see who's connected to what :/ 
 
+![Image](IMG_5285.jpeg)
+
+[▶️ Watch Demo Video](videoRFID.mp4)
