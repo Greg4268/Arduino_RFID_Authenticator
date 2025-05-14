@@ -1,13 +1,11 @@
 # 🔐 Arduino RFID Authenticator (R4 WiFi + RC522)
 
-This project is a simple RFID authentication system built using an **Arduino R4 WiFi**, an **RC522 RFID module**, and basic components like LEDs and a buzzer. It reads RFID card data and provides authentication feedback using a green LED and success tones (if authorized) or a red LED and error tones (if unauthorized).
+This project is a simple RFID authentication system built using an **Arduino R4 WiFi**, an **RC522 RFID module**, and basic components the built-in LED matrix and a buzzer. It reads RFID card data and provides authentication feedback using a check-mark and success tones (if authorized) or an 'X' and error tones (if unauthorized).
 
 ## 🛠️ Hardware Used
 
 - **Arduino R4 WiFi**
 - **RC522 RFID Module**
-- **Red LED**
-- **Green LED**
 - **Buzzer**
 - **Jumper Wires & Breadboard**
 
@@ -19,10 +17,10 @@ When an RFID card is brought near the RC522 reader:
 2. The UID is compared to a predefined `authorizedUID`.
 3. Depending on the result:
    - ✅ If the UID matches:
-     - Green LED turns on briefly
+     - LED Matrix will draw a check-mark
      - Buzzer plays two high-pitched success tones
    - ❌ If the UID doesn't match:
-     - Red LED blinks 3 times
+     - LED Matrix will draw an 'X'
      - Buzzer plays low-pitched error tones
 
 ### 🧠 Logic Overview
@@ -46,8 +44,6 @@ Loop:
 | RC522 MOSI | 11 (SPI)    |
 | RC522 MISO | 12 (SPI)    |
 | RC522 SCK  | 13 (SPI)    |
-| Green LED  | 6           |
-| Red LED    | 7           |
 | Buzzer     | 5           |
 
 ## 💾 Code Summary
@@ -66,13 +62,12 @@ Loop:
 
 - **Authentication Functions:**
   - `checkUID()` — compares scanned UID with the authorized one.
-  - `successAuth()` — lights green LED and beeps twice.
-  - `failAuth()` — blinks red LED and beeps 3 times.
+  - `successAuth()` — lights LED matrix and beeps twice.
+  - `failAuth()` — blinks LED matrix and beeps 3 times.
 
 ## ⚠️ Notes
 
 - The project uses short delays to avoid multiple quick reads (`delay(1500)`).
-- There’s a missing 220Ω resistor on the red LED. I just didn't have one so I used a short delay to flash the LED to limit damage. It’s advisable to add one to limit current and prevent damage.
 
 ## 🚀 Future Improvements
 
@@ -84,6 +79,12 @@ Loop:
 
 ### Sorry in advance, the wiring makes it difficult to see who's connected to what :/ 
 
+### **New Version using built-in LED Matrix** 
+![Image](IMG_Matrix.jpeg)
+
+[▶️ Watch Demo Video](videoRFID_Matrix.mp4)
+
+### **Old Version using Red and Green LEDs** 
 ![Image](IMG_5285.jpeg)
 
 [▶️ Watch Demo Video](videoRFID.mp4)

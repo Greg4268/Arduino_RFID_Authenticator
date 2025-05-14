@@ -3,13 +3,15 @@
 #include <MFRC522Extended.h>
 #include <deprecated.h>
 #include <require_cpp11.h>
+#include <ArduinoGraphics.h>
+#include <Arduino_LED_Matrix.h>
+#include <TextAnimation.h>
 
 #define SS_PIN 10
 #define RST_PIN 9
-#define GREEN_LED 6
-#define RED_LED 7
 #define BUZZER 5 
 
+ArduinoLEDMatrix matrix; // instance of LED matrix 
 MFRC522 mfrc522(SS_PIN, RST_PIN);
 
 byte authorizedUID[][4] = {
@@ -18,14 +20,47 @@ byte authorizedUID[][4] = {
   {0xAA, 0xAA, 0xAA, 0xAA}
 };
 
+uint8_t good[8][12] = {
+  {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+  {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+  {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0},
+  {0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0},
+  {0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0},
+  {0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0},
+  {0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0},
+  {0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
+};
+
+uint8_t bad[8][12] = {
+  {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+  {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0},
+  {0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0},
+  {0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0},
+  {0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0},
+  {0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0},
+  {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0},
+  {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+};
+
+uint8_t empty[8][12] = {
+  {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+  {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+  {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+  {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+  {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+  {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+  {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+  {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+};
+
 const int numAuthorizedCards = sizeof(authorizedUID) / sizeof(authorizedUID[0]);
 
 void setup() {
   Serial.begin(9600);
   SPI.begin();
+  matrix.begin();
+  matrix.renderBitmap(empty, 8, 12);
   mfrc522.PCD_Init();
-  pinMode(GREEN_LED, OUTPUT);
-  pinMode(RED_LED, OUTPUT);
   pinMode(BUZZER, OUTPUT);
   Serial.println("RFID Authenticator Ready");
 }
@@ -70,24 +105,20 @@ bool checkUID(byte *uid) {
 }
 
 void successAuth() {
-  digitalWrite(GREEN_LED, HIGH);
-  digitalWrite(RED_LED, LOW);
+  matrix.renderBitmap(good, 8, 12);
   tone(BUZZER, 1000, 200); // beeps
   delay(200);
   tone(BUZZER, 1500, 200);
-  delay(1000);
-  digitalWrite(GREEN_LED, LOW);
+  delay(500);
+  matrix.renderBitmap(empty, 8, 12);
 }
 
 void failAuth() {
   for(int i = 0; i < 3; i++){
-    digitalWrite(RED_LED, HIGH);
+    matrix.renderBitmap(bad, 8, 12);
     tone(BUZZER, 500, 200);
-    delay(100); // short delay cuz missing 220 Ohm resistor 
-    digitalWrite(RED_LED, LOW); 
-    // delay(1000);
-    // digitalWrite(RED_LED, LOW);
     delay(500);
+    matrix.renderBitmap(empty, 8, 12);
   }
 }
 
